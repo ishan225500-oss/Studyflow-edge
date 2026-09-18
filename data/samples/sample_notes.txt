@@ -1,0 +1,23 @@
+Unit 3: Complex Numbers and Euler's Formula
+
+A complex number is written as z = a + ib, where a is the real part and b is the imaginary part. The imaginary unit i satisfies i squared equals -1. The modulus of z is the square root of a squared plus b squared, and it gives the distance of the point from the origin on the Argand plane.
+
+Euler's formula states that e raised to the power ix equals cos x plus i sin x. It connects exponential functions with trigonometric functions. Substituting x equal to pi gives Euler's identity, which links the five constants e, i, pi, 1 and 0. Euler's formula is used to convert a complex number from rectangular form to polar form, which makes multiplication and finding powers much easier.
+
+De Moivre's theorem states that (cos x + i sin x) raised to the power n equals cos nx + i sin nx. It follows directly from Euler's formula and is used to find the nth roots of a complex number.
+
+Unit 5: Cell Biology
+
+The cell is the basic structural and functional unit of life. Robert Hooke first observed cells in 1665 while examining a thin slice of cork. Prokaryotic cells, such as bacteria, have no nuclear membrane, while eukaryotic cells have a well-defined nucleus.
+
+The mitochondria are known as the powerhouse of the cell because they produce ATP through cellular respiration. Mitochondria have a double membrane, and the inner membrane is folded into cristae, which increase the surface area for respiration.
+
+Chloroplasts are found in plant cells and are the site of photosynthesis. They contain the green pigment chlorophyll, which absorbs mainly red and blue light. During photosynthesis, carbon dioxide and water are converted into glucose and oxygen using light energy.
+
+Ribosomes are the site of protein synthesis. They are found free in the cytoplasm and attached to the rough endoplasmic reticulum. The Golgi apparatus modifies, packages and transports proteins, and lysosomes are called suicide bags because they contain digestive enzymes.
+
+Unit 7: Laws of Motion
+
+Newton's first law, also called the law of inertia, states that a body remains at rest or in uniform motion unless acted upon by an external force. Newton's second law states that force equals mass times acceleration. The SI unit of force is the newton. Newton's third law states that for every action there is an equal and opposite reaction.
+
+Momentum is the product of mass and velocity. The law of conservation of momentum states that the total momentum of an isolated system remains constant. This principle explains the recoil of a gun when a bullet is fired.

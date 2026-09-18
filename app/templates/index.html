@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyFlow Edge</title>
+<style>
+  :root {
+    --paper: #F6F8FB;
+    --page: #FFFFFF;
+    --ink: #1E3A8A;
+    --ink-soft: #3B5BB5;
+    --text: #262A33;
+    --muted: #5B6475;
+    --rule: #D5DFEE;
+    --margin: #D63B55;
+    --hl: #FFE066;
+    --hl-text: #262A33;
+    --ok: #1C7C54;
+    --bad: #B42335;
+    --field: #FFFFFF;
+    --line: 1.75rem;
+    --scale: 1;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #121826; --page: #182033; --ink: #93B4FF; --ink-soft: #B7CBFF;
+      --text: #E7ECF5; --muted: #A3ADC2; --rule: #2A3550; --margin: #FF6B81;
+      --hl: #E9C84A; --hl-text: #121826; --ok: #5FD39B; --bad: #FF8A98; --field: #10172A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #121826; --page: #182033; --ink: #93B4FF; --ink-soft: #B7CBFF;
+    --text: #E7ECF5; --muted: #A3ADC2; --rule: #2A3550; --margin: #FF6B81;
+    --hl: #E9C84A; --hl-text: #121826; --ok: #5FD39B; --bad: #FF8A98; --field: #10172A;
+    color-scheme: dark;
+  }
+
+  html { font-size: calc(100% * var(--scale)); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--text);
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 1rem; line-height: 1.55;
+  }
+  h1, h2, h3 { font-family: Cambria, "Cambria Math", Georgia, "Times New Roman", serif; color: var(--ink); margin: 0; }
+  h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 1.3rem; font-weight: 700; }
+  h3 { font-size: 1.05rem; font-weight: 700; }
+  p { margin: 0 0 .75rem; }
+  a { color: var(--ink); }
+  :focus-visible { outline: 3px solid var(--ink-soft); outline-offset: 2px; border-radius: 4px; }
+  .skip { position: absolute; left: -999px; top: 0; background: var(--ink); color: var(--page); padding: .5rem 1rem; }
+  .skip:focus { left: 1rem; z-index: 10; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  button, select, input, textarea { font: inherit; color: inherit; }
+  button {
+    cursor: pointer; border-radius: 6px; padding: .5rem .9rem;
+    border: 1.5px solid var(--ink); background: var(--ink); color: var(--page); font-weight: 600;
+  }
+  button.quiet { background: transparent; color: var(--ink); }
+  button.link { border: none; background: none; color: var(--ink); padding: .25rem .4rem; text-decoration: underline; font-weight: 500; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  select, input[type=text] {
+    background: var(--field); border: 1.5px solid var(--rule); border-radius: 6px; padding: .5rem .6rem;
+  }
+  select:focus, input[type=text]:focus { border-color: var(--ink); }
+
+  /* ---------- header ---------- */
+  header.bar {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    padding: .8rem 1.5rem; border-bottom: 1px solid var(--rule); background: var(--page);
+  }
+  header .brand { display: flex; align-items: baseline; gap: .6rem; margin-right: auto; }
+  header .tag { color: var(--muted); font-size: .9rem; }
+  .chips { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .chip { font-size: .8rem; padding: .15rem .55rem; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+  .chip.npu { border-color: var(--ok); color: var(--ok); font-weight: 600; }
+  .tools { display: flex; gap: .3rem; align-items: center; }
+  .tools button { padding: .3rem .6rem; }
+
+  /* ---------- layout ---------- */
+  main { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 960px) { main { grid-template-columns: 1fr; padding: 1rem; } }
+  .col { display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
+  .panel { background: var(--page); border: 1px solid var(--rule); border-radius: 10px; padding: 1.25rem 1.4rem; }
+  .panel > h2 { margin-bottom: .75rem; }
+
+  /* ---------- upload ---------- */
+  .drop {
+    display: grid; place-items: center; text-align: center; gap: .35rem;
+    border: 2px dashed var(--rule); border-radius: 10px; padding: 1.4rem; cursor: pointer;
+  }
+  .drop.over, .drop:focus-within { border-color: var(--ink); }
+  .drop strong { color: var(--ink); font-size: 1.05rem; }
+  .drop small { color: var(--muted); }
+  .opts { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: end; margin-top: 1rem; }
+  .opts label { display: flex; flex-direction: column; gap: .2rem; font-size: .9rem; color: var(--muted); }
+  .steps { list-style: none; display: flex; gap: .5rem 1.25rem; flex-wrap: wrap; padding: 0; margin: 1rem 0 0; font-size: .9rem; color: var(--muted); }
+  .steps li::before { content: "○ "; }
+  .steps li.active { color: var(--ink); font-weight: 600; }
+  .steps li.active::before { content: "◐ "; }
+  .steps li.done { color: var(--ok); }
+  .steps li.done::before { content: "● "; }
+  .status { margin-top: .5rem; min-height: 1.5em; color: var(--muted); }
+  .status.error { color: var(--bad); font-weight: 600; }
+
+  /* ---------- the notebook page (signature element) ---------- */
+  .notebook {
+    position: relative; background-color: var(--page);
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px), var(--rule) var(--line));
+    background-position: 0 -.3rem;
+    border: 1px solid var(--rule); border-radius: 10px;
+    padding: 0 1.4rem var(--line) 4.2rem; min-height: calc(var(--line) * 10);
+    line-height: var(--line);
+  }
+  .notebook::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 3rem;
+    border-left: 2px solid var(--margin); opacity: .8;
+  }
+  .notebook .head { height: calc(var(--line) * 2); display: flex; align-items: flex-end; justify-content: space-between; gap: .5rem; }
+  .notebook h2 { line-height: var(--line); }
+  .notebook .head button { line-height: var(--line); padding-top: 0; padding-bottom: 0; }
+  .summary { font-family: Cambria, Georgia, serif; font-size: 1.08rem; line-height: var(--line); max-width: 70ch; }
+  .summary p { margin: 0; }
+  .summary ul { margin: 0; padding-left: 1.1rem; }
+  .meta { color: var(--muted); font-size: .85rem; line-height: var(--line); }
+  .empty { color: var(--muted); font-style: italic; }
+
+  details.source { margin: 0; }
+  details.source summary { cursor: pointer; color: var(--ink); }
+  details.source pre { margin: 0; white-space: pre-wrap; font-family: inherit; font-size: .9rem; line-height: var(--line); color: var(--muted); max-height: calc(var(--line) * 8); overflow: auto; }
+
+  /* ---------- practice ---------- */
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+  .tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--rule); margin-bottom: 1rem; }
+  .tabs button { border: none; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: var(--muted); padding: .45rem .75rem; font-weight: 600; }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--margin); }
+  .cards { display: flex; flex-direction: column; gap: .9rem; }
+  .card { border: 1px solid var(--rule); border-top: 3px solid var(--margin); border-radius: 4px 4px 8px 8px; padding: .8rem 1rem; background: var(--page); }
+  .card .q { font-family: Cambria, Georgia, serif; font-size: 1.05rem; margin-bottom: .5rem; }
+  .card .marks { float: right; color: var(--muted); font-size: .8rem; margin-left: .5rem; }
+  .options { display: grid; gap: .35rem; margin: .4rem 0; }
+  .options button { text-align: left; background: var(--field); color: var(--text); border: 1.5px solid var(--rule); font-weight: 400; }
+  .options button:disabled { opacity: 1; cursor: default; color: var(--muted); }
+  .options button.correct, .options button.correct:disabled { border-color: var(--ok); color: var(--ok); font-weight: 600; }
+  .options button.wrong, .options button.wrong:disabled { border-color: var(--bad); color: var(--bad); text-decoration: line-through; }
+  .reveal { margin-top: .4rem; }
+  .answer { margin-top: .5rem; }
+  .answer ul { margin: .2rem 0; padding-left: 1.1rem; }
+  mark { background: var(--hl); color: var(--hl-text); padding: 0 .15em; border-radius: 2px; }
+  .expl { color: var(--muted); font-size: .92rem; margin-top: .3rem; }
+
+  /* ---------- ask ---------- */
+  .ask-form { display: flex; gap: .5rem; }
+  .ask-form input { flex: 1; min-width: 0; }
+  .reply { margin-top: 1rem; }
+  .reply .a { font-family: Cambria, Georgia, serif; font-size: 1.05rem; line-height: 1.65; white-space: pre-wrap; }
+  .reply blockquote { margin: .75rem 0 0; padding: .4rem .8rem; border-left: 3px solid var(--margin); color: var(--muted); font-size: .92rem; }
+  .engine { color: var(--muted); font-size: .8rem; margin-top: .5rem; }
+  .reply .explain { margin-top: .75rem; }
+  .reply .explain p { margin: .2rem 0 0; line-height: 1.6; }
+  kbd { border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; padding: 0 .3em; font-size: .85em; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .answer, .reply { animation: appear .18s ease-out; }
+    @keyframes appear { from { transform: translateY(3px); } to { transform: none; } }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#ask-input">Skip to asking a question</a>
+
+<header class="bar">
+  <div class="brand">
+    <h1>StudyFlow Edge</h1>
+    <span class="tag">Your notes stay on this PC</span>
+  </div>
+  <div class="chips" id="chips" aria-live="polite"><span class="chip">Loading models…</span></div>
+  <div class="tools" role="group" aria-label="Display settings">
+    <button class="quiet" id="smaller" title="Smaller text" aria-label="Smaller text">A−</button>
+    <button class="quiet" id="bigger" title="Larger text" aria-label="Larger text">A+</button>
+    <button class="quiet" id="theme" aria-label="Switch colour theme">Dark</button>
+    <button class="quiet" id="clear" title="Remove the current notes from memory">Clear notes</button>
+  </div>
+</header>
+
+<main>
+  <div class="col">
+    <section class="panel" aria-labelledby="upload-h">
+      <h2 id="upload-h">Add your notes</h2>
+      <label class="drop" id="drop">
+        <strong>Drop a PDF, photo or text file here</strong>
+        <small>or press Enter to choose one · PDF, PNG, JPG, TXT up to 50 MB</small>
+        <input class="visually-hidden" type="file" id="file" accept=".pdf,.png,.jpg,.jpeg,.txt,.md">
+        <span id="picked" class="meta"></span>
+      </label>
+      <div class="opts">
+        <label>Notes type
+          <select id="ocr">
+            <option value="easyocr">Printed or typed</option>
+            <option value="handwriting">Handwritten</option>
+          </select>
+        </label>
+        <label>Question style
+          <select id="style">
+            <option value="mcq">Multiple choice</option>
+            <option value="short">Short answer</option>
+            <option value="exam">Exam (2 and 5 marks)</option>
+          </select>
+        </label>
+        <label>How many
+          <select id="count">
+            <option>3</option><option selected>5</option><option>8</option><option>10</option>
+          </select>
+        </label>
+        <button id="process" disabled>Study these notes</button>
+        <button class="link" id="sample" type="button">Try sample notes</button>
+      </div>
+      <ol class="steps" id="steps" aria-label="Progress">
+        <li data-stage="extract">Read notes</li>
+        <li data-stage="summary">Summarise</li>
+        <li data-stage="questions">Make questions</li>
+      </ol>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="notebook" aria-labelledby="summary-h">
+      <div class="head">
+        <h2 id="summary-h">Summary</h2>
+        <button class="link" id="read-summary" disabled>Read aloud</button>
+      </div>
+      <div id="summary" class="summary"><p class="empty">Your summary will be written here.</p></div>
+      <div id="summary-meta" class="meta"></div>
+      <details class="source" id="source" hidden>
+        <summary>Show extracted text</summary>
+        <pre id="source-text"></pre>
+      </details>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="panel" aria-labelledby="practice-h">
+      <div class="row" style="justify-content:space-between; margin-bottom:.5rem">
+        <h2 id="practice-h">Practice</h2>
+        <div class="row">
+          <button class="quiet" id="regen" disabled>New questions</button>
+          <button class="quiet" id="export" disabled>Export flashcards (CSV)</button>
+        </div>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Question style">
+        <button role="tab" data-style="mcq" aria-selected="true">Multiple choice</button>
+        <button role="tab" data-style="short" aria-selected="false">Short answer</button>
+        <button role="tab" data-style="exam" aria-selected="false">Exam</button>
+      </div>
+      <div id="cards" class="cards" aria-live="polite"><p class="empty">Questions from your notes will appear here.</p></div>
+      <div id="q-meta" class="engine"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="ask-h">
+      <h2 id="ask-h">Ask about your notes</h2>
+      <p class="meta">Press <kbd>/</kbd> to jump here. Answers come only from your notes.</p>
+      <form class="ask-form" id="ask-form">
+        <label for="ask-input" class="visually-hidden">Your question</label>
+        <input type="text" id="ask-input" placeholder="e.g. What is Euler's formula used for?" maxlength="500" autocomplete="off">
+        <button id="ask-btn" type="submit">Ask</button>
+      </form>
+      <div id="reply" class="reply" aria-live="polite"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+
+async function api(path, opts = {}) {
+  let res;
+  try { res = await fetch(path, opts); }
+  catch { throw new Error("The StudyFlow engine isn't responding. Restart the app."); }
+  let data = null;
+  try { data = await res.json(); } catch { /* non-JSON body */ }
+  if (!res.ok) throw new Error((data && data.error) || `Request failed (${res.status}).`);
+  return data;
+}
+
+/* ---------- display settings ---------- */
+let scale = parseFloat(store.get("scale", "1"));
+function applyScale() { document.documentElement.style.setProperty("--scale", scale); store.set("scale", scale); }
+$("smaller").onclick = () => { scale = Math.max(0.85, +(scale - 0.1).toFixed(2)); applyScale(); };
+$("bigger").onclick = () => { scale = Math.min(1.6, +(scale + 0.1).toFixed(2)); applyScale(); };
+function currentTheme() {
+  const t = document.documentElement.dataset.theme;
+  if (t) return t;
+  return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function applyTheme(t) { document.documentElement.dataset.theme = t; $("theme").textContent = t === "dark" ? "Light" : "Dark"; store.set("theme", t); }
+$("theme").onclick = () => applyTheme(currentTheme() === "dark" ? "light" : "dark");
+applyScale();
+applyTheme(store.get("theme", currentTheme()));
+
+/* ---------- read aloud (Windows voices, offline) ---------- */
+function speak(text, btn) {
+  if (!("speechSynthesis" in window)) return;
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); btn.textContent = "Read aloud"; return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-IN";
+  u.onend = u.onerror = () => { btn.textContent = "Read aloud"; };
+  btn.textContent = "Stop reading";
+  speechSynthesis.speak(u);
+}
+
+/* ---------- status chips ---------- */
+function renderChips(s) {
+  const c = $("chips"); c.replaceChildren();
+  if (!s.warm && !s.warmup_error) c.append(el("span", "chip", "Loading models…"));
+  if (s.warmup_error) c.append(el("span", "chip", "Models load on first use"));
+  if (s.qa_device && s.qa_device !== "not loaded") {
+    const npu = s.qa_device.startsWith("NPU");
+    c.append(el("span", "chip" + (npu ? " npu" : ""), `Answers on ${npu ? "NPU" : "CPU"}`));
+  }
+  c.append(el("span", "chip", s.llm ? `Local LLM: ${s.llm}` : "Compact models"));
+}
+async function pollStatus() {
+  try {
+    const s = await api("/api/status");
+    renderChips(s);
+    if (s.session && !current) showResult(s.session);
+    if (!s.warm && !s.warmup_error) setTimeout(pollStatus, 1500);
+  } catch { setTimeout(pollStatus, 3000); }
+}
+
+/* ---------- upload ---------- */
+let current = null;
+let activeStyle = "mcq";
+const drop = $("drop"), fileInput = $("file");
+drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
+drop.tabIndex = 0;
+fileInput.tabIndex = -1;
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => { if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; picked(); } });
+fileInput.addEventListener("change", picked);
+function picked() {
+  const f = fileInput.files[0];
+  $("picked").textContent = f ? `Selected: ${f.name}` : "";
+  $("process").disabled = !f;
+}
+$("style").addEventListener("change", () => selectTab($("style").value, false));
+
+function setStatus(msg, isError = false) { const s = $("status"); s.textContent = msg; s.classList.toggle("error", isError); }
+function setStage(stage) {
+  const order = ["extract", "summary", "questions"];
+  const idx = stage === "done" ? order.length : order.indexOf(stage);
+  document.querySelectorAll("#steps li").forEach((li, i) => {
+    li.classList.toggle("done", idx > i);
+    li.classList.toggle("active", idx === i);
+  });
+}
+
+$("process").onclick = async () => {
+  const f = fileInput.files[0];
+  if (!f) return;
+  const form = new FormData();
+  form.append("file", f);
+  form.append("style", $("style").value);
+  form.append("num_questions", $("count").value);
+  form.append("ocr", $("ocr").value);
+  $("process").disabled = true;
+  setStage("extract"); setStatus("Uploading");
+  try {
+    const { job_id } = await api("/api/upload", { method: "POST", body: form });
+    await followJob(job_id);
+  } catch (e) {
+    setStage(null); setStatus(e.message, true);
+  } finally {
+    $("process").disabled = !fileInput.files[0];
+  }
+};
+
+$("sample").onclick = async () => {
+  $("sample").disabled = true;
+  setStage("extract"); setStatus("Opening sample notes");
+  try {
+    const { job_id } = await api("/api/sample", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ style: $("style").value }),
+    });
+    await followJob(job_id);
+  } catch (e) { setStage(null); setStatus(e.message, true); }
+  finally { $("sample").disabled = false; }
+};
+
+async function followJob(id) {
+  while (true) {
+    const j = await api(`/api/jobs/${id}`);
+    if (j.state === "error") throw new Error(j.error);
+    setStage(j.stage === "queued" ? "extract" : j.stage);
+    if (j.state === "done") {
+      setStatus(`Ready in ${j.elapsed_s}s.`);
+      showResult(j.result);
+      pollStatus();
+      return;
+    }
+    setStatus(j.message + "…");
+    await new Promise(r => setTimeout(r, 600));
+  }
+}
+
+/* ---------- rendering ---------- */
+function renderPoints(container, text) {
+  const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
+  const bullets = lines.filter(l => /^[-•*]\s+/.test(l));
+  if (bullets.length >= 2) {
+    const intro = lines.filter(l => !/^[-•*]\s+/.test(l));
+    intro.forEach(l => container.append(el("p", null, l)));
+    const ul = el("ul");
+    bullets.forEach(l => ul.append(el("li", null, l.replace(/^[-•*]\s+/, ""))));
+    container.append(ul);
+  } else {
+    lines.forEach(l => container.append(el("p", null, l)));
+  }
+}
+
+function showResult(r) {
+  current = r;
+  const box = $("summary"); box.replaceChildren();
+  renderPoints(box, r.summary || "No summary was produced.");
+  const st = r.stats || {};
+  const parts = [r.filename];
+  if (st.pages) parts.push(`${st.pages} page${st.pages > 1 ? "s" : ""}`);
+  if (st.ocr_pages) parts.push(`${st.ocr_pages} scanned`);
+  $("summary-meta").textContent = parts.join(", ") + (r.engines ? `. Written by ${r.engines.summary}.` : "");
+  $("source").hidden = false;
+  $("source-text").textContent = r.text_preview + (st.chars > 600 ? " …" : "");
+  $("read-summary").disabled = false;
+  ["regen", "export"].forEach(id => $(id).disabled = false);
+  selectTab(r.style || $("style").value, false);
+  renderQuestions(r.questions || [], r.engines && r.engines.questions);
+}
+
+function renderQuestions(qs, engine) {
+  const box = $("cards"); box.replaceChildren();
+  if (!qs.length) {
+    box.append(el("p", "empty", "No questions could be made from this text. Try another style or clearer notes."));
+  }
+  qs.forEach((q, i) => {
+    const card = el("article", "card");
+    card.setAttribute("aria-label", `Question ${i + 1}`);
+    if (q.marks > 1) card.append(el("span", "marks", `${q.marks} marks`));
+    card.append(el("div", "q", `${i + 1}. ${q.question}`));
+    const ans = el("div", "answer");
+    ans.hidden = true;
+    if (q.type === "long" && q.answer.includes("\n")) {
+      const ul = el("ul");
+      q.answer.split("\n").map(s => s.replace(/^[-•*\d.)\s]+/, "").trim()).filter(Boolean)
+        .forEach(p => { const li = el("li"); li.append(el("mark", null, p)); ul.append(li); });
+      ans.append(el("strong", null, "Model answer"), ul);
+    } else {
+      const p = el("p"); p.append("Answer: ", el("mark", null, q.answer)); ans.append(p);
+    }
+    if (q.explanation) ans.append(el("p", "expl", q.explanation));
+
+    if (q.type === "mcq" && q.options && q.options.length) {
+      const opts = el("div", "options");
+      opts.setAttribute("role", "group");
+      opts.setAttribute("aria-label", "Options");
+      q.options.forEach((o, k) => {
+        const b = el("button", null, `${String.fromCharCode(65 + k)}. ${o}`);
+        b.type = "button";
+        b.onclick = () => {
+          opts.querySelectorAll("button").forEach(x => x.disabled = true);
+          const right = o === q.answer;
+          b.classList.add(right ? "correct" : "wrong");
+          if (!right) [...opts.children].find((x, idx) => q.options[idx] === q.answer)?.classList.add("correct");
+          ans.hidden = false;
+        };
+        opts.append(b);
+      });
+      card.append(opts);
+    } else {
+      const btn = el("button", "quiet reveal", "Show answer");
+      btn.type = "button";
+      btn.setAttribute("aria-expanded", "false");
+      btn.onclick = () => {
+        ans.hidden = !ans.hidden;
+        btn.textContent = ans.hidden ? "Show answer" : "Hide answer";
+        btn.setAttribute("aria-expanded", String(!ans.hidden));
+      };
+      card.append(btn);
+    }
+    card.append(ans);
+    box.append(card);
+  });
+  $("q-meta").textContent = engine ? `Made by ${engine}` : "";
+}
+
+function selectTab(style, regenerate) {
+  activeStyle = style;
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.style === style)));
+  $("style").value = style;
+  if (regenerate) regen();
+}
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { if (current) selectTab(b.dataset.style, b.dataset.style !== current.style); else selectTab(b.dataset.style, false); });
+
+async function regen() {
+  if (!current) return;
+  const btn = $("regen"); btn.disabled = true;
+  $("cards").replaceChildren(el("p", "empty", "Writing new questions…"));
+  try {
+    const r = await api("/api/questions", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ style: activeStyle, num_questions: +$("count").value }),
+    });
+    current.questions = r.questions; current.style = activeStyle;
+    renderQuestions(r.questions, r.engine);
+  } catch (e) {
+    $("cards").replaceChildren(el("p", "status error", e.message));
+  } finally { btn.disabled = false; }
+}
+$("regen").onclick = regen;
+$("export").onclick = () => { window.location.href = "/api/export/flashcards.csv"; };
+$("read-summary").onclick = (e) => speak($("summary").innerText, e.currentTarget);
+
+/* ---------- ask ---------- */
+$("ask-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const q = $("ask-input").value.trim();
+  const out = $("reply");
+  if (!q) { out.replaceChildren(el("p", "status error", "Type a question first.")); return; }
+  $("ask-btn").disabled = true;
+  out.replaceChildren(el("p", "empty", "Looking through your notes…"));
+  try {
+    const r = await api("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q }) });
+    out.replaceChildren();
+    if (!r.found) {
+      out.append(el("p", "a", "Your notes don't seem to cover this. Try different words, or upload the chapter that explains it."));
+    } else {
+      out.append(el("p", "a", r.answer));
+      if (r.evidence) {
+        const bq = el("blockquote");
+        bq.append(el("span", null, "From your notes: "), el("span", null, r.evidence));
+        out.append(bq);
+      }
+      if (r.explanation) {
+        const ex = el("div", "explain");
+        ex.append(el("strong", null, "Explanation"), el("p", null, r.explanation),
+                  el("div", "engine", `Written by ${r.explanation_engine} from the quoted notes`));
+        out.append(ex);
+      }
+      const read = el("button", "link", "Read aloud");
+      read.type = "button";
+      const spoken = r.explanation ? `${r.answer}. ${r.explanation}` : r.answer;
+      read.onclick = (ev) => speak(spoken, ev.currentTarget);
+      out.append(read);
+    }
+    const where = r.found ? `Answer found by ${r.engine}` : `Checked by ${r.engine}`;
+    out.append(el("div", "engine", `${where}, ${Math.round(r.latency_ms)} ms`));
+  } catch (err) {
+    out.replaceChildren(el("p", "status error", err.message));
+  } finally { $("ask-btn").disabled = false; }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) {
+    e.preventDefault(); $("ask-input").focus();
+  }
+});
+
+$("clear").onclick = async () => {
+  await api("/api/clear", { method: "POST" }).catch(() => {});
+  current = null;
+  $("summary").replaceChildren(el("p", "empty", "Your summary will be written here."));
+  $("summary-meta").textContent = "";
+  $("source").hidden = true;
+  $("cards").replaceChildren(el("p", "empty", "Questions from your notes will appear here."));
+  $("q-meta").textContent = "";
+  $("reply").replaceChildren();
+  ["regen", "export", "read-summary"].forEach(id => $(id).disabled = true);
+  setStage(null); setStatus("Notes cleared from memory.");
+};
+
+pollStatus();
+</script>
+</body>
+</html>

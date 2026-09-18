@@ -1,0 +1,15 @@
+# StudyFlow Edge: core app (pin exact versions once your setup works: pip freeze > requirements.lock)
+flask>=3.0,<4
+numpy>=1.26,<3
+pillow>=10
+PyMuPDF>=1.24                 # imported as fitz: PDF text layer + page rendering
+easyocr>=1.7                  # printed-notes OCR (pulls in torch + opencv)
+torch>=2.3
+transformers>=4.44,<5         # QA tokenizer, TrOCR, compact fallback models
+sentencepiece                 # T5 tokenizers
+huggingface_hub>=0.24
+onnxruntime>=1.18             # on the Snapdragon PC install onnxruntime-qnn instead (see README)
+psutil                        # memory numbers in benchmarks
+
+# Desktop app
+pywebview>=5

@@ -1,0 +1,258 @@
+{
+  "description": "Labelled QA set over data/samples/sample_notes.txt. Items with an empty 'answers' list are not covered by the notes and must be rejected. 'near_miss' items share keywords with the notes, so retrieval finds a passage and only the QA confidence threshold can reject them. Add items from your own notes before reporting numbers.",
+  "context_file": "sample_notes.txt",
+  "items": [
+    {
+      "question": "What does Euler's formula state?",
+      "answers": [
+        "e raised to the power ix equals cos x plus i sin x"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is the modulus of a complex number?",
+      "answers": [
+        "the square root of a squared plus b squared"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is De Moivre's theorem used for?",
+      "answers": [
+        "to find the nth roots of a complex number",
+        "find the nth roots of a complex number"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Who first observed cells?",
+      "answers": [
+        "Robert Hooke"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "When were cells first observed?",
+      "answers": [
+        "1665",
+        "in 1665"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Which organelle produces ATP?",
+      "answers": [
+        "mitochondria",
+        "The mitochondria"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What are the folds of the inner mitochondrial membrane called?",
+      "answers": [
+        "cristae"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Which light does chlorophyll absorb?",
+      "answers": [
+        "red and blue light",
+        "mainly red and blue light"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Where does protein synthesis take place?",
+      "answers": [
+        "Ribosomes"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Why are lysosomes called suicide bags?",
+      "answers": [
+        "because they contain digestive enzymes",
+        "they contain digestive enzymes"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is Newton's first law also called?",
+      "answers": [
+        "the law of inertia",
+        "law of inertia"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is the SI unit of force?",
+      "answers": [
+        "the newton",
+        "newton"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is momentum?",
+      "answers": [
+        "the product of mass and velocity",
+        "product of mass and velocity"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What does the conservation of momentum explain?",
+      "answers": [
+        "the recoil of a gun when a bullet is fired",
+        "the recoil of a gun"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is the capital of Australia?",
+      "answers": [],
+      "kind": "off_topic"
+    },
+    {
+      "question": "What is the basic structural and functional unit of life?",
+      "answers": [
+        "The cell",
+        "cell"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Which pigment do chloroplasts contain?",
+      "answers": [
+        "chlorophyll",
+        "the green pigment chlorophyll",
+        "green pigment chlorophyll"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What does the Golgi apparatus do?",
+      "answers": [
+        "modifies, packages and transports proteins"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What is Newton's second law?",
+      "answers": [
+        "force equals mass times acceleration"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Which cells have no nuclear membrane?",
+      "answers": [
+        "Prokaryotic cells",
+        "prokaryotic cells, such as bacteria",
+        "bacteria"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What does the modulus of a complex number represent on the Argand plane?",
+      "answers": [
+        "the distance of the point from the origin",
+        "distance of the point from the origin on the Argand plane"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "According to the law of conservation of momentum, what stays constant?",
+      "answers": [
+        "the total momentum of an isolated system",
+        "total momentum"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "What did Robert Hooke examine when he first saw cells?",
+      "answers": [
+        "a thin slice of cork",
+        "thin slice of cork",
+        "cork"
+      ],
+      "kind": "answerable"
+    },
+    {
+      "question": "Who discovered mitochondria?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the SI unit of momentum?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the function of the nucleus?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the argument of a complex number?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is Newton's law of universal gravitation?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the SI unit of acceleration?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "At what temperature does water boil?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "How many ATP molecules does glycolysis produce?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the Krebs cycle?",
+      "answers": [],
+      "kind": "off_topic"
+    },
+    {
+      "question": "When was Euler born?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What do lysosomes look like under a microscope?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the formula for kinetic energy?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "Who won the 2011 Cricket World Cup?",
+      "answers": [],
+      "kind": "off_topic"
+    },
+    {
+      "question": "How do vaccines train the immune system?",
+      "answers": [],
+      "kind": "near_miss"
+    },
+    {
+      "question": "What is the GDP of India?",
+      "answers": [],
+      "kind": "off_topic"
+    }
+  ]
+}

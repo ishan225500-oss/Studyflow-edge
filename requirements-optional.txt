@@ -1,0 +1,12 @@
+# Local LLM for better summaries, exam questions and explanations
+llama-cpp-python>=0.3
+
+# Better key-phrase picking in the compact question generator
+spacy>=3.7            # then: python -m spacy download en_core_web_sm
+
+# Building the NPU model
+onnx>=1.16
+qai-hub               # Qualcomm AI Hub client (compile + profile on real Snapdragon devices)
+
+# Packaging
+pyinstaller>=6
